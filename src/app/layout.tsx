@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 
-// 配置 Geist Sans 字体
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-// 配置 Geist Mono 字体 (用于代码展示)
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// 使用系统字体，避免 Google 字体加载问题
+// 在生产环境中，如果需要 Google 字体，可以配置代理或使用本地字体文件
 
 // 配置网站元数据 (SEO优化)
 export const metadata: Metadata = {
@@ -41,7 +31,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900`}
+        className="antialiased bg-gray-50 dark:bg-gray-900 font-sans"
+        style={{
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        }}
       >
         {/* 导航栏组件 */}
         <Navigation />
