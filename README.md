@@ -37,6 +37,126 @@ bun dev
 
 在浏览器中打开 [http://localhost:3000](http://localhost:3000) 查看应用。
 
+### 故障排除
+
+如果遇到启动问题，请按以下步骤操作：
+
+#### 问题 1: 端口被占用
+
+如果看到 `Port 3000 is in use` 错误：
+
+**Windows (PowerShell):**
+```powershell
+# 查找占用端口的进程
+netstat -ano | findstr ":3000"
+
+# 终止进程（将 PID 替换为实际的进程 ID）
+Stop-Process -Id <PID> -Force
+```
+
+**macOS/Linux:**
+```bash
+# 查找占用端口的进程
+lsof -ti:3000
+
+# 终止进程
+kill -9 $(lsof -ti:3000)
+```
+
+#### 问题 2: 锁文件冲突
+
+如果看到 `Unable to acquire lock` 错误，说明有另一个 Next.js 实例正在运行或之前的实例未正确关闭：
+
+**Windows (PowerShell):**
+```powershell
+# 删除锁文件和 .next 目录
+Remove-Item -Recurse -Force .next
+```
+
+**macOS/Linux:**
+```bash
+# 删除锁文件和 .next 目录
+rm -rf .next
+```
+
+#### 问题 3: 清理并重新启动
+
+如果上述方法无效，执行完整清理：
+
+**Windows (PowerShell):**
+```powershell
+# 1. 停止所有 Node.js 进程（谨慎使用）
+Get-Process | Where-Object {$_.ProcessName -eq "node"} | Stop-Process -Force
+
+# 2. 清理构建文件
+Remove-Item -Recurse -Force .next
+Remove-Item -Recurse -Force node_modules
+
+# 3. 重新安装依赖
+npm install
+
+# 4. 重新启动开发服务器
+npm run dev
+```
+
+**macOS/Linux:**
+```bash
+# 1. 停止所有 Node.js 进程（谨慎使用）
+pkill -f node
+
+# 2. 清理构建文件
+rm -rf .next node_modules
+
+# 3. 重新安装依赖
+npm install
+
+# 4. 重新启动开发服务器
+npm run dev
+```
+
+#### 问题 4: 安全漏洞警告
+
+如果看到 `npm audit` 警告：
+
+```bash
+# 查看详细的安全报告
+npm audit
+
+# 自动修复（如果可能）
+npm audit fix
+
+# 强制修复（谨慎使用，可能会更新主要版本）
+npm audit fix --force
+```
+
+#### 正确的启动流程
+
+1. **首次启动或清理后：**
+   ```bash
+   # 安装依赖
+   npm install
+   
+   # 启动开发服务器
+   npm run dev
+   ```
+
+2. **正常重启：**
+   ```bash
+   # 在运行开发服务器的终端按 Ctrl+C 停止
+   # 然后重新运行
+   npm run dev
+   ```
+
+3. **验证服务器运行：**
+   - 检查终端输出，应该看到：
+     ```
+     ✓ Starting...
+     ✓ Ready in X seconds
+     - Local: http://localhost:3000
+     ```
+   - 在浏览器访问 http://localhost:3000
+   - 如果端口被占用，Next.js 会自动使用下一个可用端口（如 3001）
+
 ## 📁 项目结构
 
 ```
